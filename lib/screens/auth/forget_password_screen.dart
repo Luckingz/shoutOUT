@@ -16,7 +16,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   UserType _selectedUserType = UserType.citizen;
 
-  // Add the missing _login methods
+  // Add the missing _login method
   Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
       final authService = Provider.of<AuthService>(context, listen: false);
