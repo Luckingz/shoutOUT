@@ -5,6 +5,9 @@ import '../../services/auth_service.dart';
 import '../../models/user.dart';
 
 class RegisterScreen extends StatefulWidget {
+  // 1. ADD const constructor
+  const RegisterScreen({super.key});
+
   @override
   _RegisterScreenState createState() => _RegisterScreenState();
 }
@@ -18,35 +21,65 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _agencyController = TextEditingController();
   UserType _selectedUserType = UserType.citizen;
 
+  // 2. UPDATE NAVIGATION LOGIC IN _register()
+  void _register() async {
+    if (_formKey.currentState!.validate()) {
+      // Show loading indicator is implicitly handled by the Consumer
+      final authService = Provider.of<AuthService>(context, listen: false);
+
+      bool success = await authService.register(
+        _nameController.text,
+        _emailController.text,
+        _passwordController.text,
+        _selectedUserType,
+        badgeNumber: _selectedUserType == UserType.security ? _badgeController.text : null,
+        agency: _selectedUserType == UserType.security ? _agencyController.text : null,
+      );
+
+      if (success) {
+        // --- CRITICAL CHANGE: Navigate to the root/AuthWrapper ---
+        // The AuthWrapper will detect the newly signed-in user and redirect.
+        Navigator.of(context).pushReplacementNamed('/');
+        // --------------------------------------------------------
+
+      } else {
+        // A generic error message, as Firebase Auth errors are detailed.
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Registration failed. Please check if the email is already in use.')),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Register'),
-        backgroundColor: Colors.blue,
+        title: const Text('Register'), // Added const
+        backgroundColor: Colors.indigo, // Changed to indigo for consistency
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0), // Added const
         child: Form(
           key: _formKey,
           child: SingleChildScrollView(
             child: Column(
               children: [
-                SizedBox(height: 20),
+                const SizedBox(height: 20), // Added const
 
                 // User Type Selection
                 Card(
                   child: Padding(
-                    padding: EdgeInsets.all(16.0),
+                    padding: const EdgeInsets.all(16.0), // Added const
                     child: Column(
                       children: [
-                        Text('Register as', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                        SizedBox(height: 10),
+                        const Text('Register as', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)), // Added const
+                        const SizedBox(height: 10), // Added const
                         Row(
                           children: [
                             Expanded(
                               child: RadioListTile<UserType>(
-                                title: Text('Citizen'),
+                                title: const Text('Citizen'), // Added const
                                 value: UserType.citizen,
                                 groupValue: _selectedUserType,
                                 onChanged: (value) {
@@ -58,7 +91,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ),
                             Expanded(
                               child: RadioListTile<UserType>(
-                                title: Text('Security Personnel'),
+                                title: const Text('Security Personnel'), // Added const
                                 value: UserType.security,
                                 groupValue: _selectedUserType,
                                 onChanged: (value) {
@@ -75,12 +108,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ),
 
-                SizedBox(height: 20),
+                const SizedBox(height: 20), // Added const
 
                 // Name Field
                 TextFormField(
                   controller: _nameController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration( // Added const
                     labelText: 'Full Name',
                     prefixIcon: Icon(Icons.person),
                     border: OutlineInputBorder(),
@@ -93,12 +126,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   },
                 ),
 
-                SizedBox(height: 16),
+                const SizedBox(height: 16), // Added const
 
                 // Email Field
                 TextFormField(
                   controller: _emailController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration( // Added const
                     labelText: 'Email',
                     prefixIcon: Icon(Icons.email),
                     border: OutlineInputBorder(),
@@ -112,12 +145,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   },
                 ),
 
-                SizedBox(height: 16),
+                const SizedBox(height: 16), // Added const
 
                 // Password Field
                 TextFormField(
                   controller: _passwordController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration( // Added const
                     labelText: 'Password',
                     prefixIcon: Icon(Icons.lock),
                     border: OutlineInputBorder(),
@@ -136,10 +169,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
                 // Security Personnel Additional Fields
                 if (_selectedUserType == UserType.security) ...[
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16), // Added const
                   TextFormField(
                     controller: _badgeController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration( // Added const
                       labelText: 'Badge Number',
                       prefixIcon: Icon(Icons.badge),
                       border: OutlineInputBorder(),
@@ -151,10 +184,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       return null;
                     },
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16), // Added const
                   TextFormField(
                     controller: _agencyController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration( // Added const
                       labelText: 'Agency/Department',
                       prefixIcon: Icon(Icons.business),
                       border: OutlineInputBorder(),
@@ -168,7 +201,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ],
 
-                SizedBox(height: 24),
+                const SizedBox(height: 24), // Added const
 
                 // Register Button
                 Consumer<AuthService>(
@@ -179,10 +212,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       child: ElevatedButton(
                         onPressed: authService.isLoading ? null : _register,
                         child: authService.isLoading
-                            ? CircularProgressIndicator(color: Colors.white)
-                            : Text('Register', style: TextStyle(fontSize: 18)),
+                            ? const CircularProgressIndicator(color: Colors.white) // Added const
+                            : const Text('Register', style: TextStyle(fontSize: 18, color: Colors.white)), // Added const
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
+                          backgroundColor: Colors.indigo, // Changed to indigo
                           foregroundColor: Colors.white,
                         ),
                       ),
@@ -190,14 +223,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   },
                 ),
 
-                SizedBox(height: 16),
+                const SizedBox(height: 16), // Added const
 
                 // Login Link
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: Text('Already have an account? Login'),
+                  child: const Text('Already have an account? Login'), // Added const
                 ),
               ],
             ),
@@ -207,33 +240,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  void _register() async {
-    if (_formKey.currentState!.validate()) {
-      final authService = Provider.of<AuthService>(context, listen: false);
-
-      bool success = await authService.register(
-        _nameController.text,
-        _emailController.text,
-        _passwordController.text,
-        _selectedUserType,
-        badgeNumber: _selectedUserType == UserType.security ? _badgeController.text : null,
-        agency: _selectedUserType == UserType.security ? _agencyController.text : null,
-      );
-
-      if (success) {
-        if (_selectedUserType == UserType.citizen) {
-          Navigator.of(context).pushReplacementNamed('/citizen-home');
-        } else {
-          Navigator.of(context).pushReplacementNamed('/security-home');
-        }
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Registration failed. Please try again.')),
-        );
-      }
-    }
-  }
-
+  // ... (dispose method remains the same)
   @override
   void dispose() {
     _nameController.dispose();
